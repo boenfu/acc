@@ -1,17 +1,16 @@
 import React, { useRef, useEffect } from "react";
 import "./App.css";
 
-const GRID_SIZE = 40;
-const CONTAINER_PADDING = 20;
-
-const CHESSBOARD_WIDTH = GRID_SIZE * 8;
-const CHESSBOARD_HEIGHT = GRID_SIZE * 9;
-
-const CONTAINER_WIDTH = CHESSBOARD_WIDTH + CONTAINER_PADDING * 2;
-const CONTAINER_HEIGHT = CHESSBOARD_HEIGHT + CONTAINER_PADDING * 2;
-
-const PIECE_RADIUS = 16;
-const PIECE_PADDING = 3;
+import {
+  CONTAINER_HEIGHT,
+  CONTAINER_WIDTH,
+  CONTAINER_PADDING,
+  CHESSBOARD_HEIGHT,
+  CHESSBOARD_WIDTH,
+  GRID_SIZE,
+  PIECE_PADDING,
+  PIECE_RADIUS,
+} from "./constant";
 
 const App: React.FC = () => {
   let canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,25 +19,9 @@ const App: React.FC = () => {
     let canvasDom: HTMLCanvasElement = canvasRef.current!;
     let context = initChessboard(canvasDom);
 
-    // 画一个棋子 context
+    addEvent(canvasDom);
+
     drawPiece(context);
-
-    canvasDom.addEventListener("click", ({ offsetX, offsetY }: MouseEvent) => {
-      let x = offsetX - CONTAINER_PADDING;
-      let y = offsetY - CONTAINER_PADDING;
-
-      let xIndex = Math.round(x / GRID_SIZE);
-      let yIndex = Math.round(y / GRID_SIZE);
-
-      if (
-        Math.abs(x - GRID_SIZE * xIndex) > PIECE_RADIUS ||
-        Math.abs(y - GRID_SIZE * yIndex) > PIECE_RADIUS
-      ) {
-        return;
-      }
-
-      console.log(xIndex, yIndex);
-    });
   });
 
   return (
@@ -50,6 +33,10 @@ const App: React.FC = () => {
 
 export default App;
 
+/**
+ * 初始化棋盘
+ * @param canvasDom
+ */
 function initChessboard(
   canvasDom: HTMLCanvasElement
 ): CanvasRenderingContext2D {
@@ -114,6 +101,33 @@ function initChessboard(
   return context;
 }
 
+/**
+ * 初始化事件
+ * @param context
+ */
+function addEvent(canvasDom: HTMLCanvasElement): void {
+  canvasDom.addEventListener("click", ({ offsetX, offsetY }: MouseEvent) => {
+    let x = offsetX - CONTAINER_PADDING;
+    let y = offsetY - CONTAINER_PADDING;
+
+    let xIndex = Math.round(x / GRID_SIZE);
+    let yIndex = Math.round(y / GRID_SIZE);
+
+    if (
+      Math.abs(x - GRID_SIZE * xIndex) > PIECE_RADIUS ||
+      Math.abs(y - GRID_SIZE * yIndex) > PIECE_RADIUS
+    ) {
+      return;
+    }
+
+    console.log(xIndex, yIndex);
+  });
+}
+
+/**
+ * 画棋子
+ * @param context
+ */
 function drawPiece(context: CanvasRenderingContext2D): void {
   context.beginPath();
   context.strokeStyle = "#000";
@@ -132,7 +146,5 @@ function drawPiece(context: CanvasRenderingContext2D): void {
   context.font = "18px STheiti, SimHei";
   context.fillStyle = "#000";
 
-  // 汉字的结构不一样 为达到视觉上完美的居中 需要手动调整
-  // 后文会细说
   context.fillText("馬", 11.5, 26);
 }
