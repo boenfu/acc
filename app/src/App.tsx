@@ -8,9 +8,19 @@ import {
   CHESSBOARD_HEIGHT,
   CHESSBOARD_WIDTH,
   GRID_SIZE,
-  PIECE_PADDING,
   PIECE_RADIUS,
 } from "./constant";
+import {
+  Horse,
+  Rook,
+  Guard,
+  Eleph,
+  King,
+  Cannon,
+  Pawn,
+  PieceFaction,
+  Piece,
+} from "./piece";
 
 const App: React.FC = () => {
   let canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,7 +31,9 @@ const App: React.FC = () => {
 
     addEvent(canvasDom);
 
-    drawPiece(context);
+    let pieces = initializePiece(context);
+
+    drawPiece(pieces);
   });
 
   return (
@@ -125,26 +137,33 @@ function addEvent(canvasDom: HTMLCanvasElement): void {
 }
 
 /**
+ * 初始化棋子
+ * @param context
+ */
+function initializePiece(context: CanvasRenderingContext2D): Piece[] {
+  let factions: PieceFaction[] = ["汉", "楚"];
+
+  return factions.flatMap(faction => {
+    return [
+      new King(context, { faction }),
+      ...Array(2)
+        .fill(undefined)
+        .flatMap((_val, index) =>
+          [Horse, Rook, Guard, Eleph, Cannon].map(
+            PieceClass => new PieceClass(context, { faction, id: index + 1 })
+          )
+        ),
+      ...Array(5)
+        .fill(undefined)
+        .map((_val, index) => new Pawn(context, { faction, id: index + 1 })),
+    ];
+  });
+}
+
+/**
  * 画棋子
  * @param context
  */
-function drawPiece(context: CanvasRenderingContext2D): void {
-  context.beginPath();
-  context.strokeStyle = "#000";
-  context.arc(20, 20, PIECE_RADIUS, 0, Math.PI * 2);
-  context.stroke();
-
-  context.beginPath();
-  context.fillStyle = "#fff";
-  context.arc(20, 20, PIECE_RADIUS - 1, 0, Math.PI * 2);
-  context.fill();
-
-  context.beginPath();
-  context.arc(20, 20, PIECE_RADIUS - PIECE_PADDING, 0, Math.PI * 2);
-  context.stroke();
-
-  context.font = "18px STheiti, SimHei";
-  context.fillStyle = "#000";
-
-  context.fillText("馬", 11.5, 26);
+function drawPiece(pieces: Piece[]): void {
+  pieces.forEach(piece => piece.draw());
 }
