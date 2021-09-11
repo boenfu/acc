@@ -1,2 +1,3 @@
 # acc
-Awesome Chinese Chess
+
+Animal Chinese Chess

@@ -1,28 +1,30 @@
-import React, { useRef, useEffect } from "react";
-import "./App.css";
+import React, {useEffect, useRef} from 'react';
+
+import './App.css';
 
 import {
-  CONTAINER_HEIGHT,
-  CONTAINER_WIDTH,
-  CONTAINER_PADDING,
   CHESSBOARD_HEIGHT,
   CHESSBOARD_WIDTH,
+  CONTAINER_HEIGHT,
+  CONTAINER_PADDING,
+  CONTAINER_WIDTH,
   GRID_SIZE,
   PIECE_RADIUS,
-} from "./constant";
+} from './const';
 import {
-  Horse,
-  Rook,
-  Guard,
-  Eleph,
-  King,
   Cannon,
+  Eleph,
+  Guard,
+  Horse,
+  King,
   Pawn,
-  PieceFaction,
   Piece,
-} from "./piece";
+  PieceFaction,
+  Rook,
+} from './piece';
 
 const App: React.FC = () => {
+  // eslint-disable-next-line no-null/no-null
   let canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -34,11 +36,11 @@ const App: React.FC = () => {
     let pieces = initializePiece(context);
 
     drawPiece(pieces);
-  });
+  }, []);
 
   return (
     <div className="App">
-      <canvas ref={canvasRef}></canvas>
+      <canvas ref={canvasRef} />
     </div>
   );
 };
@@ -50,9 +52,9 @@ export default App;
  * @param canvasDom
  */
 function initChessboard(
-  canvasDom: HTMLCanvasElement
+  canvasDom: HTMLCanvasElement,
 ): CanvasRenderingContext2D {
-  let context = canvasDom.getContext("2d")!;
+  let context = canvasDom.getContext('2d')!;
 
   canvasDom.style.width = `${CONTAINER_WIDTH}px`;
   canvasDom.style.height = `${CONTAINER_HEIGHT}px`;
@@ -82,21 +84,21 @@ function initChessboard(
     // 画 \ 线
     context.moveTo(
       CONTAINER_PADDING + GRID_SIZE * 3,
-      CONTAINER_PADDING + GRID_SIZE * startY
+      CONTAINER_PADDING + GRID_SIZE * startY,
     );
     context.lineTo(
       CONTAINER_PADDING + GRID_SIZE * 5,
-      CONTAINER_PADDING + GRID_SIZE * (startY + 2)
+      CONTAINER_PADDING + GRID_SIZE * (startY + 2),
     );
 
     // 画 / 线
     context.moveTo(
       CONTAINER_PADDING + GRID_SIZE * 5,
-      CONTAINER_PADDING + GRID_SIZE * startY
+      CONTAINER_PADDING + GRID_SIZE * startY,
     );
     context.lineTo(
       CONTAINER_PADDING + GRID_SIZE * 3,
-      CONTAINER_PADDING + GRID_SIZE * (startY + 2)
+      CONTAINER_PADDING + GRID_SIZE * (startY + 2),
     );
   }
 
@@ -107,7 +109,7 @@ function initChessboard(
     CONTAINER_PADDING + 1,
     CONTAINER_PADDING + GRID_SIZE * 4 + 1,
     CONTAINER_WIDTH - 2,
-    GRID_SIZE - 2
+    GRID_SIZE - 2,
   );
 
   return context;
@@ -118,7 +120,18 @@ function initChessboard(
  * @param context
  */
 function addEvent(canvasDom: HTMLCanvasElement): void {
-  canvasDom.addEventListener("click", ({ offsetX, offsetY }: MouseEvent) => {
+  canvasDom.addEventListener('click', (event: MouseEvent) => {
+    console.info('click', getIndex(event));
+  });
+
+  canvasDom.addEventListener('mousemove', (event: MouseEvent) => {
+    console.info('move', getIndex(event));
+  });
+
+  function getIndex({
+    offsetX,
+    offsetY,
+  }: MouseEvent): [x: number, y: number] | undefined {
     let x = offsetX - CONTAINER_PADDING;
     let y = offsetY - CONTAINER_PADDING;
 
@@ -132,8 +145,8 @@ function addEvent(canvasDom: HTMLCanvasElement): void {
       return;
     }
 
-    console.log(xIndex, yIndex);
-  });
+    return [xIndex, yIndex];
+  }
 }
 
 /**
@@ -141,21 +154,21 @@ function addEvent(canvasDom: HTMLCanvasElement): void {
  * @param context
  */
 function initializePiece(context: CanvasRenderingContext2D): Piece[] {
-  let factions: PieceFaction[] = ["汉", "楚"];
+  let factions: PieceFaction[] = ['red', 'blue'];
 
   return factions.flatMap(faction => {
     return [
-      new King(context, { faction }),
+      new King(context, {faction}),
       ...Array(2)
         .fill(undefined)
         .flatMap((_val, index) =>
           [Horse, Rook, Guard, Eleph, Cannon].map(
-            PieceClass => new PieceClass(context, { faction, id: index + 1 })
-          )
+            PieceClass => new PieceClass(context, {faction, id: index + 1}),
+          ),
         ),
       ...Array(5)
         .fill(undefined)
-        .map((_val, index) => new Pawn(context, { faction, id: index + 1 })),
+        .map((_val, index) => new Pawn(context, {faction, id: index + 1})),
     ];
   });
 }
