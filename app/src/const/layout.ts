@@ -9,14 +9,24 @@ export const GRID_SIZE = 40;
 export const CONTAINER_PADDING = 20;
 
 /**
+ * 棋盘列数
+ */
+export const CHESSBOARD_COLUMN_SIZE = 9;
+
+/**
+ * 棋盘行数
+ */
+export const CHESSBOARD_ROW_SIZE = 10;
+
+/**
  * 棋盘宽度
  */
-export const CHESSBOARD_WIDTH = GRID_SIZE * 8;
+export const CHESSBOARD_WIDTH = GRID_SIZE * (CHESSBOARD_COLUMN_SIZE - 1);
 
 /**
  * 棋盘高度
  */
-export const CHESSBOARD_HEIGHT = GRID_SIZE * 9;
+export const CHESSBOARD_HEIGHT = GRID_SIZE * (CHESSBOARD_ROW_SIZE - 1);
 
 /**
  * 容器宽度
