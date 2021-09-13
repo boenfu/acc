@@ -78,4 +78,7 @@ typings/
 
 .next
 
+tsconfig.tsbuildinfo
+
 dist/
+bld/

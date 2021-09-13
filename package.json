@@ -3,7 +3,8 @@
   "private": true,
   "author": "boenfu",
   "workspaces": [
-    "app"
+    "app",
+    "server"
   ],
   "devDependencies": {
     "@mufan/code": "^0.2.8",
