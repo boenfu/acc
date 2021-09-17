@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": false,
@@ -13,9 +12,15 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
+    "useDefineForClassFields": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ]
 }

@@ -1,16 +1,15 @@
 {
-  "name": "server",
+  "name": "shared",
   "version": "0.1.0",
-  "main": "bld/main.js",
+  "main": "bld/index.js",
+  "module": "src/index.ts",
+  "types": "bld/index.d.ts",
   "author": "boenfu",
   "license": "MIT",
   "private": true,
-  "scripts": {
-    "start": "node bld/main.js"
-  },
   "dependencies": {
-    "fastify": "^3.21.0",
-    "fastify-socket.io": "^2.0.1",
+    "chinese-random-name": "^1.0.0",
+    "mobx": "^6.3.3",
     "nanoid": "^3.1.25",
     "protobufjs": "^6.11.2"
   }

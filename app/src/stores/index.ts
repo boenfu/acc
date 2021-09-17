@@ -1,2 +1,2 @@
 export * from './chess';
-export * from './server';
+export * from './room';

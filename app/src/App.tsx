@@ -2,7 +2,13 @@ import {Provider, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
 import styled from 'styled-components';
 
-import {ApplicationCard, ChessBoard, FactionTip, PieceCard} from './components';
+import {
+  ApplicationCard,
+  ChessBoard,
+  FactionTip,
+  PieceCard,
+  RoomInfo,
+} from './components';
 import {CONTAINER_WIDTH} from './const';
 import * as stores from './stores';
 
@@ -16,6 +22,8 @@ const Wrapper = styled.div`
 `;
 
 const Left = styled.div`
+  position: relative;
+  max-width: 372px;
   flex: 1;
   background-color: aliceblue;
 `;
@@ -39,6 +47,7 @@ export default class extends Component {
       <Wrapper className="app">
         <Provider {...stores}>
           <Left>
+            <RoomInfo />
             <ApplicationCard />
           </Left>
           <Mid>

@@ -4,14 +4,9 @@
     "composite": true,
 
     "rootDir": "src",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "experimentalDecorators": true,
 
     "outDir": "bld"
-  },
-  "references": [
-    {
-      "path": "../shared"
-    }
-  ]
+  }
 }
