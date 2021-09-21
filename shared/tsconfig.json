@@ -4,7 +4,7 @@
     "composite": true,
 
     "rootDir": "src",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "experimentalDecorators": true,
 
     "outDir": "bld"

@@ -1,3 +1,4 @@
+import {Button} from 'antd';
 import {computed} from 'mobx';
 import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, MouseEvent, ReactNode, createRef} from 'react';
@@ -13,7 +14,7 @@ import {
   PIECE_RADIUS,
 } from '../const';
 import * as stores from '../stores';
-import {IChessStore} from '../stores';
+import {IChessStore, IRoomStore} from '../stores';
 
 import {PieceComponent} from './piece';
 
@@ -76,6 +77,10 @@ const Restart = styled.div`
 
 @observer
 export class ChessBoard extends Component {
+  private get roomStore(): IRoomStore {
+    return this.context.roomStore;
+  }
+
   private get chessStore(): IChessStore {
     return this.context.chessStore;
   }
@@ -94,13 +99,20 @@ export class ChessBoard extends Component {
 
   render(): ReactNode {
     let gameOver = this.gameOver;
+    let {room, api} = this.roomStore;
+
+    console.log(room?.game);
 
     return (
       <ChessWrapper className={this.gameOver ? 'gameOver' : undefined}>
         <canvas ref={this.canvasRef} onClick={this.onCanvasClick} />
-        {Object.entries(stores.chessStore.pieceMap).map(([id, piece]) => (
-          <PieceComponent key={id} piece={piece} />
-        ))}
+        {!room?.game ? (
+          <Button onClick={() => api.startGame()}>开始对局</Button>
+        ) : (
+          Object.entries(stores.chessStore.pieceMap).map(([id, piece]) => (
+            <PieceComponent key={id} piece={piece} />
+          ))
+        )}
         {gameOver ? (
           <Restart onClick={this.chessStore.restart}>再来一局</Restart>
         ) : undefined}

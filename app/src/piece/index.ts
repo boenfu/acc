@@ -6,3 +6,4 @@ export * from './king';
 export * from './rook';
 export * from './cannon';
 export * from './pawn';
+export * from './_mapping';

@@ -1,61 +1,56 @@
-import {action, computed, makeObservable, observable} from 'mobx';
+import {computed, makeObservable} from 'mobx';
 import {FC} from 'react';
 
+import {
+  GameFaction,
+  IPiecePosition,
+  Piece as PieceMessage,
+  PieceContext,
+  PieceCore,
+  PiecesGrid,
+} from '../../../shared';
 import {CHESSBOARD_ROW_SIZE} from '../const';
 
-export type PieceFaction = 'red' | 'blue';
+export type PiecePosition = IPiecePosition;
 
-export interface PieceOptions {
-  faction: PieceFaction;
-  id: number;
-}
-
-export interface PiecePosition {
-  x: number;
-  y: number;
-}
-
-export type PieceGrid = (string | undefined)[][];
-
-export interface PieceContext {
-  pieceGrid: PieceGrid;
+export interface ChessContext {
+  piecesGrid: PiecesGrid;
   getPiece(piece: string): Piece;
 }
 
 export interface PieceFactionIdentity {
   displayName: string;
   Icon: FC;
-  initializePosition(id?: number): PiecePosition;
 }
 
 export interface PieceIdentity {
   type: string;
   name: string;
-  red: PieceFactionIdentity;
-  blue: PieceFactionIdentity;
+  [GameFaction.RED]: PieceFactionIdentity;
+  [GameFaction.BLUE]: PieceFactionIdentity;
   description: string;
 }
 
 export abstract class Piece {
   abstract identity: PieceIdentity;
 
-  abstract get nextPositions(): PiecePosition[];
+  get globalId(): string {
+    return `${this.faction}_${this.message.kind}_${this.message.id}`;
+  }
 
-  globalId!: string;
+  get position(): PiecePosition {
+    return this.message.position;
+  }
 
-  position!: PiecePosition;
-
-  dead = false;
-
-  get faction(): PieceFaction {
-    return this.options.faction;
+  get dead(): boolean {
+    return this.message.dead;
   }
 
   get overseas(): boolean {
     let y = this.position.y;
     let edge = CHESSBOARD_ROW_SIZE / 2;
 
-    return this.faction === 'red' ? y < edge : y >= edge;
+    return this.faction === GameFaction.RED ? y < edge : y >= edge;
   }
 
   get factionIdentity(): PieceFactionIdentity {
@@ -66,20 +61,29 @@ export abstract class Piece {
     return this.factionIdentity.Icon;
   }
 
-  constructor(readonly options: PieceOptions, readonly context: PieceContext) {
-    makeObservable(this, {
-      position: observable,
-      dead: observable,
-      nextPositions: computed,
-      overseas: computed,
-      initialize: action,
-    });
+  get context(): PieceContext {
+    return {
+      piecesGrid: this.chessContext.piecesGrid,
+      overseas: this.overseas,
+      faction: this.faction,
+    };
   }
 
-  initialize(): void {
-    let {faction, id} = this.options;
+  get nextPositions(): PiecePosition[] {
+    return PieceCore[
+      this.identity.type as keyof typeof PieceCore
+    ].getNextPositions(this.position, this.context);
+  }
 
-    this.position = this.identity[faction].initializePosition(id);
-    this.globalId = `${faction}_${this.identity.type}_${id}`;
+  constructor(
+    readonly faction: GameFaction,
+    readonly message: PieceMessage,
+    readonly chessContext: ChessContext,
+  ) {
+    makeObservable(this, {
+      context: computed,
+      nextPositions: computed,
+      overseas: computed,
+    });
   }
 }

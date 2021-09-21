@@ -1,23 +1,18 @@
 import {action, computed, makeObservable, observable} from 'mobx';
 
+import {GameFaction, PiecesGrid, Room} from '../../../shared';
 import {CHESSBOARD_COLUMN_SIZE, CHESSBOARD_ROW_SIZE} from '../const';
 import {
-  Cannon,
-  Eleph,
-  Guard,
-  Horse,
-  King,
-  Pawn,
+  ChessContext,
   Piece,
-  PieceContext,
-  PieceFaction,
-  PieceGrid,
+  PieceKindToConstructorDict,
   PiecePosition,
-  Rook,
 } from '../piece';
 
+import {IRoomStore, roomStore} from './room';
+
 export interface IChessStore {
-  currentFaction: PieceFaction;
+  currentFaction: GameFaction;
   selecting: string | undefined;
   pieceMap: Record<string, Piece>;
   gameOver: boolean;
@@ -30,11 +25,14 @@ export interface IChessStore {
 }
 
 class ChessStore implements IChessStore {
-  currentFaction: PieceFaction = 'red';
+  currentFaction: GameFaction = GameFaction.RED;
   selecting: string | undefined;
-  pieceMap = initializePieceMap(this);
 
-  get pieceGrid(): PieceGrid {
+  get pieceMap(): Record<string, Piece> {
+    return buildPiecesMap(this.roomStore.room!, this);
+  }
+
+  get piecesGrid(): PiecesGrid {
     let pieceMap = this.pieceMap || {};
     let grid = Array(CHESSBOARD_ROW_SIZE)
       .fill(undefined)
@@ -56,12 +54,12 @@ class ChessStore implements IChessStore {
     return pieceMap['red_king_1']?.dead || pieceMap['blue_king_1']?.dead;
   }
 
-  constructor() {
+  constructor(readonly roomStore: IRoomStore) {
     makeObservable(this, {
       currentFaction: observable,
       selecting: observable,
-      pieceMap: observable,
-      pieceGrid: computed,
+      pieceMap: computed,
+      piecesGrid: computed,
       gameOver: computed,
 
       restart: action,
@@ -84,9 +82,9 @@ class ChessStore implements IChessStore {
     }
   };
 
-  changePieceDead = (id: string | PiecePosition, dead: boolean): void => {
+  changePieceDead = (id: string | PiecePosition, _dead: boolean): void => {
     if (typeof id !== 'string') {
-      id = this.pieceGrid[id.y][id.x]!;
+      id = this.piecesGrid[id.y][id.x]!;
     }
 
     let piece = this.pieceMap[id];
@@ -95,27 +93,29 @@ class ChessStore implements IChessStore {
       return;
     }
 
-    piece.dead = dead;
+    // piece.dead = dead;
   };
 
-  changePiecePosition = (id: string, position: PiecePosition): void => {
+  changePiecePosition = (id: string, _position: PiecePosition): void => {
     let piece = this.pieceMap[id];
 
     if (!piece) {
       return;
     }
 
-    piece.position = position;
+    // piece.position = position;
   };
 
   toggleCurrentFaction = (): void => {
-    this.currentFaction = this.currentFaction === 'red' ? 'blue' : 'red';
+    this.currentFaction =
+      this.currentFaction === GameFaction.RED
+        ? GameFaction.BLUE
+        : GameFaction.RED;
   };
 
   restart = (): void => {
-    this.currentFaction = 'red';
+    this.currentFaction = GameFaction.RED;
     this.selecting = undefined;
-    this.pieceMap = initializePieceMap(this);
   };
 
   getPiece = (piece: string): Piece => {
@@ -123,32 +123,32 @@ class ChessStore implements IChessStore {
   };
 }
 
-export const chessStore = new ChessStore();
+export const chessStore = new ChessStore(roomStore);
 
-function initializePieceMap(context: PieceContext): Record<string, Piece> {
-  let factions: PieceFaction[] = ['red', 'blue'];
-
+function buildPiecesMap(
+  room: Room,
+  context: ChessContext,
+): Record<string, Piece> {
   return Object.fromEntries(
-    factions
-      .flatMap(faction => {
-        return [
-          new King({faction, id: 1}, context),
-          ...Array(2)
-            .fill(undefined)
-            .flatMap((_val, index) =>
-              [Horse, Rook, Guard, Eleph, Cannon].map(
-                PieceClass => new PieceClass({faction, id: index + 1}, context),
-              ),
-            ),
-          ...Array(5)
-            .fill(undefined)
-            .map((_val, index) => new Pawn({faction, id: index + 1}, context)),
-        ];
-      })
-      .map(piece => {
-        piece.initialize();
-
-        return [piece.globalId, piece];
-      }),
+    [
+      ...(room?.game?.redPieces.map(
+        piece =>
+          new (PieceKindToConstructorDict[piece.kind] as unknown as any)(
+            GameFaction.RED,
+            piece,
+            context,
+          ),
+      ) ?? []),
+      ...(room?.game?.bluePieces.map(
+        piece =>
+          new (PieceKindToConstructorDict[piece.kind] as unknown as any)(
+            GameFaction.BLUE,
+            piece,
+            context,
+          ),
+      ) ?? []),
+    ].map(piece => {
+      return [piece.globalId, piece];
+    }),
   );
 }

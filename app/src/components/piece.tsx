@@ -101,7 +101,10 @@ export class PieceComponent extends Component<{
 
     let {moveable, attackable} = this.active
       ? groupPositions(this.piece)
-      : {moveable: [], attackable: []};
+      : {
+          moveable: [],
+          attackable: [],
+        };
 
     return (
       <>
@@ -177,7 +180,10 @@ export class PieceComponent extends Component<{
   static contextType = MobXProviderContext;
 }
 
-function getTranslateStyle({x, y}: PiecePosition): {left: number; top: number} {
+function getTranslateStyle({x, y}: PiecePosition): {
+  left: number;
+  top: number;
+} {
   return {
     left: x * GRID_SIZE + CONTAINER_PADDING,
     top: y * GRID_SIZE + CONTAINER_PADDING,
@@ -191,7 +197,7 @@ function groupPositions(piece: Piece): {
   let {
     faction,
     nextPositions,
-    context: {pieceGrid, getPiece},
+    chessContext: {piecesGrid, getPiece},
   } = piece;
 
   let moveable: PiecePosition[] = [];
@@ -207,8 +213,8 @@ function groupPositions(piece: Piece): {
       continue;
     }
 
-    if (pieceGrid[y][x]) {
-      if (faction !== getPiece(pieceGrid[y][x]!).faction) {
+    if (piecesGrid[y][x]) {
+      if (faction !== getPiece(piecesGrid[y][x]!).faction) {
         attackable.push({x, y});
       } else {
         // 合体 ?

@@ -3,7 +3,7 @@ import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
 import styled from 'styled-components';
 
-import {PieceFaction} from '../piece';
+import {GameFaction} from '../../../shared';
 import {KingBlue, KingRed} from '../resources/icons';
 import {IChessStore} from '../stores';
 
@@ -28,7 +28,7 @@ export class FactionTip extends Component {
   }
 
   @computed
-  private get currentFaction(): PieceFaction {
+  private get currentFaction(): GameFaction {
     let {currentFaction} = this.chessStore;
     return currentFaction;
   }
@@ -40,17 +40,17 @@ export class FactionTip extends Component {
   }
 
   render(): ReactNode {
-    let faction = this.currentFaction;
-    let gameOver = this.gameOver;
+    // let faction = this.currentFaction;
+    // let gameOver = this.gameOver;
 
     return (
       <>
         <Wrapper>
-          {gameOver ? (
+          {/* {gameOver ? (
             <>{faction === 'red' ? <KingBlue /> : <KingRed />}胜利 !</>
           ) : (
             <>轮到{faction === 'red' ? <KingRed /> : <KingBlue />}了 !</>
-          )}
+          )} */}
         </Wrapper>
       </>
     );

@@ -42,13 +42,7 @@ export class SwopFaction extends Component {
   }
 
   render(): ReactNode {
-    let {
-      room,
-      isBlue,
-      isRed,
-      swopFaction: onSwopFaction,
-      refuseSwopFaction: onRefuseSwopFaction,
-    } = this.roomStore;
+    let {room, isBlue, isRed, api} = this.roomStore;
 
     if (!room) {
       return <></>;
@@ -63,7 +57,7 @@ export class SwopFaction extends Component {
       ) {
         return (
           <>
-            <Button type="primary" onClick={onSwopFaction}>
+            <Button type="primary" onClick={() => api.swopFaction()}>
               同意
             </Button>
             <Tooltip
@@ -72,7 +66,7 @@ export class SwopFaction extends Component {
               color="cyan"
               visible
             >
-              <Button onClick={onRefuseSwopFaction}>拒绝</Button>
+              <Button onClick={() => api.refuseSwopFaction()}>拒绝</Button>
             </Tooltip>
           </>
         );
@@ -84,13 +78,13 @@ export class SwopFaction extends Component {
             color="volcano"
             visible
           >
-            <Button onClick={onRefuseSwopFaction}>取消</Button>
+            <Button onClick={() => api.refuseSwopFaction()}>取消</Button>
           </Tooltip>
         );
       }
     }
 
-    return <Button onClick={onSwopFaction}>交换阵营</Button>;
+    return <Button onClick={() => api.swopFaction()}>交换阵营</Button>;
   }
 
   static contextType = MobXProviderContext;

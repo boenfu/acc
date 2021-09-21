@@ -153,7 +153,7 @@ export class RoomInfo extends Component {
                     maxLength={6}
                     autoFocus
                     onPressEnter={event => {
-                      void this.roomStore.joinRoom(
+                      void this.roomStore.api.joinRoom(
                         (event.target as HTMLInputElement).value,
                       );
                     }}
