@@ -1,32 +1,29 @@
-import {action, computed, makeObservable, observable} from 'mobx';
+import {action, autorun, computed, makeObservable, observable} from 'mobx';
 
 import {GameFaction, PiecesGrid, Room} from '../../../shared';
 import {CHESSBOARD_COLUMN_SIZE, CHESSBOARD_ROW_SIZE} from '../const';
-import {
-  ChessContext,
-  Piece,
-  PieceKindToConstructorDict,
-  PiecePosition,
-} from '../piece';
+import {ChessContext, Piece, PieceKindToConstructorDict} from '../piece';
 
 import {IRoomStore, roomStore} from './room';
 
 export interface IChessStore {
   currentFaction: GameFaction;
   selecting: string | undefined;
+  competitorSelecting: string | undefined;
   pieceMap: Record<string, Piece>;
   gameOver: boolean;
 
   restart(): void;
-  toggleCurrentFaction(): void;
+  // toggleCurrentFaction(): void;
   changeSelectingPiece(piece: Piece | undefined): void;
-  changePieceDead(id: string | PiecePosition, dead: boolean): void;
-  changePiecePosition(id: string, position: PiecePosition): void;
+  // changePieceDead(id: string | PiecePosition, dead: boolean): void;
+  // changePiecePosition(id: string, position: PiecePosition): void;
 }
 
 class ChessStore implements IChessStore {
   currentFaction: GameFaction = GameFaction.RED;
   selecting: string | undefined;
+  competitorSelecting: string | undefined;
 
   get pieceMap(): Record<string, Piece> {
     return buildPiecesMap(this.roomStore.room!, this);
@@ -63,10 +60,29 @@ class ChessStore implements IChessStore {
       gameOver: computed,
 
       restart: action,
-      toggleCurrentFaction: action,
+      //   toggleCurrentFaction: action,
       changeSelectingPiece: action,
-      changePiecePosition: action,
-      changePieceDead: action,
+      //   changePiecePosition: action,
+      //   changePieceDead: action,
+    });
+
+    autorun(() => {
+      let {room, isRed} = this.roomStore;
+      let game = room?.game;
+
+      if (!game) {
+        return;
+      }
+
+      let {redSelectingPiece, blueSelectingPiece} = game;
+
+      if (isRed) {
+        this.selecting = redSelectingPiece;
+        this.competitorSelecting = blueSelectingPiece;
+      } else {
+        this.selecting = blueSelectingPiece;
+        this.competitorSelecting = redSelectingPiece;
+      }
     });
   }
 
@@ -80,37 +96,8 @@ class ChessStore implements IChessStore {
     } else {
       this.selecting = undefined;
     }
-  };
 
-  changePieceDead = (id: string | PiecePosition, _dead: boolean): void => {
-    if (typeof id !== 'string') {
-      id = this.piecesGrid[id.y][id.x]!;
-    }
-
-    let piece = this.pieceMap[id];
-
-    if (!piece) {
-      return;
-    }
-
-    // piece.dead = dead;
-  };
-
-  changePiecePosition = (id: string, _position: PiecePosition): void => {
-    let piece = this.pieceMap[id];
-
-    if (!piece) {
-      return;
-    }
-
-    // piece.position = position;
-  };
-
-  toggleCurrentFaction = (): void => {
-    this.currentFaction =
-      this.currentFaction === GameFaction.RED
-        ? GameFaction.BLUE
-        : GameFaction.RED;
+    void this.roomStore.api.changeSelectingPiece(piece?.globalId);
   };
 
   restart = (): void => {
@@ -130,25 +117,12 @@ function buildPiecesMap(
   context: ChessContext,
 ): Record<string, Piece> {
   return Object.fromEntries(
-    [
-      ...(room?.game?.redPieces.map(
-        piece =>
-          new (PieceKindToConstructorDict[piece.kind] as unknown as any)(
-            GameFaction.RED,
-            piece,
-            context,
-          ),
-      ) ?? []),
-      ...(room?.game?.bluePieces.map(
-        piece =>
-          new (PieceKindToConstructorDict[piece.kind] as unknown as any)(
-            GameFaction.BLUE,
-            piece,
-            context,
-          ),
-      ) ?? []),
-    ].map(piece => {
-      return [piece.globalId, piece];
-    }),
+    room?.game?.pieces.map(piece => {
+      let instance = new (PieceKindToConstructorDict[
+        piece.kind
+      ] as unknown as any)(piece, context);
+
+      return [instance.globalId, instance];
+    }) ?? [],
   );
 }

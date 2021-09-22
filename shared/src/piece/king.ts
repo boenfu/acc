@@ -65,6 +65,7 @@ export function initializePieces(faction: GameFaction): Piece[] {
   position.x = x;
   position.y = y;
   piece.position = position;
+  piece.faction = faction;
 
   return [piece];
 }

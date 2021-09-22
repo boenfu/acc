@@ -1,6 +1,6 @@
 import {Field, Message} from 'protobufjs/light';
 
-import {PieceKind} from './_enum';
+import {GameFaction, PieceKind} from './_enum';
 
 export class PiecePosition extends Message<PiecePosition> {
   @Field.d(1, 'int32', 'required', 0)
@@ -11,6 +11,9 @@ export class PiecePosition extends Message<PiecePosition> {
 }
 
 export class Piece extends Message<Piece> {
+  @Field.d(0, GameFaction)
+  faction!: GameFaction;
+
   @Field.d(1, PieceKind)
   kind!: PieceKind;
 

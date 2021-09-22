@@ -95,6 +95,11 @@ export class PieceComponent extends Component<{
     return this.chessStore.selecting === this.props.piece.globalId;
   }
 
+  @computed
+  private get highlight(): boolean {
+    return this.chessStore.competitorSelecting === this.props.piece.globalId;
+  }
+
   render(): ReactNode {
     let {position, dead, Icon} = this.piece;
     let {left, top} = getTranslateStyle(position);
@@ -112,7 +117,7 @@ export class PieceComponent extends Component<{
           className={dead ? 'dead' : undefined}
           style={{
             transform: `translate(calc(${left}px - 50%), calc(${top}px - 50%)) ${
-              this.active ? 'scale(1.4)' : ''
+              this.active || this.highlight ? 'scale(1.4)' : ''
             }`,
           }}
           onClick={this.onSelect}
@@ -162,19 +167,19 @@ export class PieceComponent extends Component<{
   private onMove = (event: MouseEvent<HTMLDivElement>): void => {
     let [x, y] = (event.target as HTMLElement).dataset.grid!.split(',');
 
-    this.chessStore.changePiecePosition(this.piece.globalId, {x: +x, y: +y});
-    this.chessStore.changeSelectingPiece(undefined);
-    this.chessStore.toggleCurrentFaction();
+    // this.chessStore.changePiecePosition(this.piece.globalId, {x: +x, y: +y});
+    // this.chessStore.changeSelectingPiece(undefined);
+    // this.chessStore.toggleCurrentFaction();
   };
 
   private onAttack = (event: MouseEvent<HTMLDivElement>): void => {
     let [x, y] = (event.target as HTMLElement).dataset.grid!.split(',');
 
     let position = {x: +x, y: +y};
-    this.chessStore.changePieceDead(position, true);
-    this.chessStore.changePiecePosition(this.piece.globalId, position);
-    this.chessStore.changeSelectingPiece(undefined);
-    this.chessStore.toggleCurrentFaction();
+    // this.chessStore.changePieceDead(position, true);
+    // this.chessStore.changePiecePosition(this.piece.globalId, position);
+    // this.chessStore.changeSelectingPiece(undefined);
+    // this.chessStore.toggleCurrentFaction();
   };
 
   static contextType = MobXProviderContext;

@@ -5,16 +5,13 @@ import {GameFaction, RequestStatus} from './_enum';
 
 export class Game extends Message<Game> {
   @Field.d(1, Piece, 'repeated', [])
-  redPieces: Piece[] = [];
+  pieces: Piece[] = [];
 
-  @Field.d(2, Piece, 'repeated', [])
-  bluePieces: Piece[] = [];
+  @Field.d(3, 'string', 'optional')
+  redSelectingPiece: string | undefined;
 
-  @Field.d(3, Piece, 'optional')
-  redSelectingPiece: Piece | undefined;
-
-  @Field.d(4, Piece, 'optional')
-  blueSelectingPiece: Piece | undefined;
+  @Field.d(4, 'string', 'optional')
+  blueSelectingPiece: string | undefined;
 
   @Field.d(5, GameFaction, 'required', GameFaction.RED)
   currentFaction: GameFaction = GameFaction.RED;

@@ -35,7 +35,11 @@ export abstract class Piece {
   abstract identity: PieceIdentity;
 
   get globalId(): string {
-    return `${this.faction}_${this.message.kind}_${this.message.id}`;
+    return getGlobalId(this.message);
+  }
+
+  get faction(): GameFaction {
+    return this.message.faction;
   }
 
   get position(): PiecePosition {
@@ -70,13 +74,11 @@ export abstract class Piece {
   }
 
   get nextPositions(): PiecePosition[] {
-    return PieceCore[
-      this.identity.type as keyof typeof PieceCore
-    ].getNextPositions(this.position, this.context);
+    let kind = this.message.kind;
+    return PieceCore[kind].getNextPositions(this.position, this.context);
   }
 
   constructor(
-    readonly faction: GameFaction,
     readonly message: PieceMessage,
     readonly chessContext: ChessContext,
   ) {
@@ -86,4 +88,8 @@ export abstract class Piece {
       overseas: computed,
     });
   }
+}
+
+export function getGlobalId({faction, kind, id}: PieceMessage): string {
+  return `${faction}_${kind}_${id}`;
 }
