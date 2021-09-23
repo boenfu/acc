@@ -16,7 +16,7 @@ export class SwopFaction extends Component {
     disposeOnUnmount(
       this,
       reaction(
-        () => [this.roomStore.room?.swopFaction],
+        () => this.roomStore.room?.swopFaction,
         () => {
           let {room, isRed, isBlue} = this.roomStore;
 

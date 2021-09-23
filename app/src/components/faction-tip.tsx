@@ -4,8 +4,7 @@ import React, {Component, ReactNode} from 'react';
 import styled from 'styled-components';
 
 import {GameFaction} from '../../../shared';
-import {KingBlue, KingRed} from '../resources/icons';
-import {IChessStore} from '../stores';
+import {IChessStore, IRoomStore} from '../stores';
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,34 +22,41 @@ const Wrapper = styled.div`
 
 @observer
 export class FactionTip extends Component {
+  private get roomStore(): IRoomStore {
+    return this.context.roomStore;
+  }
+
   private get chessStore(): IChessStore {
     return this.context.chessStore;
   }
 
   @computed
-  private get currentFaction(): GameFaction {
-    let {currentFaction} = this.chessStore;
-    return currentFaction;
+  private get myTum(): boolean {
+    let {myTum} = this.chessStore;
+    return myTum;
   }
 
   @computed
-  private get gameOver(): boolean {
-    let {gameOver} = this.chessStore;
-    return gameOver;
+  private get victor(): GameFaction | undefined {
+    let {room} = this.roomStore;
+    return room?.game?.victor;
   }
 
   render(): ReactNode {
-    // let faction = this.currentFaction;
-    // let gameOver = this.gameOver;
+    let myTum = this.myTum;
+
+    let victor = this.victor;
 
     return (
       <>
         <Wrapper>
-          {/* {gameOver ? (
-            <>{faction === 'red' ? <KingBlue /> : <KingRed />}胜利 !</>
+          {victor ? (
+            <>对局结束</>
+          ) : myTum ? (
+            <>轮到你了 !</>
           ) : (
-            <>轮到{faction === 'red' ? <KingRed /> : <KingBlue />}了 !</>
-          )} */}
+            <>等待对方行棋 !</>
+          )}
         </Wrapper>
       </>
     );

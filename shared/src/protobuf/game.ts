@@ -19,6 +19,6 @@ export class Game extends Message<Game> {
   @Field.d(6, RequestStatus, 'required', RequestStatus.NONE)
   regret: RequestStatus = RequestStatus.NONE;
 
-  @Field.d(7, 'bool', 'required', false)
-  gameOver: boolean = false;
+  @Field.d(7, GameFaction, 'optional')
+  victor: GameFaction | undefined;
 }

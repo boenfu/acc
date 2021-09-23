@@ -1,29 +1,36 @@
 import {action, autorun, computed, makeObservable, observable} from 'mobx';
 
-import {GameFaction, PiecesGrid, Room} from '../../../shared';
-import {CHESSBOARD_COLUMN_SIZE, CHESSBOARD_ROW_SIZE} from '../const';
-import {ChessContext, Piece, PieceKindToConstructorDict} from '../piece';
+import {
+  CHESSBOARD_COLUMN_SIZE,
+  CHESSBOARD_ROW_SIZE,
+  GameFaction,
+  PiecesGrid,
+  Room,
+} from '../../../shared';
+import {
+  ChessContext,
+  Piece,
+  PieceKindToConstructorDict,
+  PiecePosition,
+} from '../piece';
 
 import {IRoomStore, roomStore} from './room';
 
 export interface IChessStore {
-  currentFaction: GameFaction;
+  myTum: boolean;
   selecting: string | undefined;
   competitorSelecting: string | undefined;
   pieceMap: Record<string, Piece>;
-  gameOver: boolean;
 
   restart(): void;
-  // toggleCurrentFaction(): void;
   changeSelectingPiece(piece: Piece | undefined): void;
-  // changePieceDead(id: string | PiecePosition, dead: boolean): void;
-  // changePiecePosition(id: string, position: PiecePosition): void;
+  changePiecePosition(id: string, position: PiecePosition): void;
 }
 
 class ChessStore implements IChessStore {
-  currentFaction: GameFaction = GameFaction.RED;
   selecting: string | undefined;
   competitorSelecting: string | undefined;
+  myTum = false;
 
   get pieceMap(): Record<string, Piece> {
     return buildPiecesMap(this.roomStore.room!, this);
@@ -46,28 +53,17 @@ class ChessStore implements IChessStore {
     return grid;
   }
 
-  get gameOver(): boolean {
-    let pieceMap = this.pieceMap;
-    return pieceMap['red_king_1']?.dead || pieceMap['blue_king_1']?.dead;
-  }
-
   constructor(readonly roomStore: IRoomStore) {
     makeObservable(this, {
-      currentFaction: observable,
+      myTum: observable,
       selecting: observable,
       pieceMap: computed,
       piecesGrid: computed,
-      gameOver: computed,
-
       restart: action,
-      //   toggleCurrentFaction: action,
-      changeSelectingPiece: action,
-      //   changePiecePosition: action,
-      //   changePieceDead: action,
     });
 
     autorun(() => {
-      let {room, isRed} = this.roomStore;
+      let {room, isRed, isBlue} = this.roomStore;
       let game = room?.game;
 
       if (!game) {
@@ -83,13 +79,23 @@ class ChessStore implements IChessStore {
         this.selecting = blueSelectingPiece;
         this.competitorSelecting = redSelectingPiece;
       }
+
+      this.myTum =
+        (game.currentFaction === GameFaction.RED && isRed) ||
+        (game.currentFaction === GameFaction.BLUE && isBlue);
     });
   }
 
   changeSelectingPiece = (piece: Piece | undefined): void => {
     if (piece) {
-      if (piece.faction !== this.currentFaction) {
-        return;
+      if (this.roomStore.isRed) {
+        if (piece.faction !== GameFaction.RED) {
+          return;
+        }
+      } else {
+        if (piece.faction !== GameFaction.BLUE) {
+          return;
+        }
       }
 
       this.selecting = piece.globalId;
@@ -100,9 +106,19 @@ class ChessStore implements IChessStore {
     void this.roomStore.api.changeSelectingPiece(piece?.globalId);
   };
 
+  changePiecePosition = (id: string, position: PiecePosition): void => {
+    let piece = this.pieceMap[id];
+
+    if (!piece) {
+      return;
+    }
+
+    piece.position = position;
+    void this.roomStore.api.changePiecePosition(position);
+  };
+
   restart = (): void => {
-    this.currentFaction = GameFaction.RED;
-    this.selecting = undefined;
+    void this.roomStore.api.startGame();
   };
 
   getPiece = (piece: string): Piece => {

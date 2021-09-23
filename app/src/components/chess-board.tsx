@@ -1,4 +1,5 @@
 import {Button} from 'antd';
+import classNames from 'classnames';
 import {computed} from 'mobx';
 import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, MouseEvent, ReactNode, createRef} from 'react';
@@ -11,8 +12,9 @@ import {
   CONTAINER_PADDING,
   CONTAINER_WIDTH,
   GRID_SIZE,
+  GameFaction,
   PIECE_RADIUS,
-} from '../const';
+} from '../../../shared';
 import * as stores from '../stores';
 import {IChessStore, IRoomStore} from '../stores';
 
@@ -45,6 +47,10 @@ const ChessWrapper = styled.div`
       transition: all 2s ease-out;
       filter: grayscale(1);
     }
+  }
+
+  &.reversal {
+    transform: rotate(180deg) scale(1.2);
   }
 `;
 
@@ -88,9 +94,9 @@ export class ChessBoard extends Component {
   private canvasRef = createRef<HTMLCanvasElement>();
 
   @computed
-  private get gameOver(): boolean {
-    let {gameOver} = this.chessStore;
-    return gameOver;
+  private get victor(): GameFaction | undefined {
+    let {room} = this.roomStore;
+    return room?.game?.victor;
   }
 
   componentDidMount(): void {
@@ -98,13 +104,18 @@ export class ChessBoard extends Component {
   }
 
   render(): ReactNode {
-    let gameOver = this.gameOver;
-    let {room, api} = this.roomStore;
+    let victor = this.victor;
+    let {room, api, isBlue} = this.roomStore;
 
-    console.log(room?.game);
+    let reversal = isBlue;
 
     return (
-      <ChessWrapper className={this.gameOver ? 'gameOver' : undefined}>
+      <ChessWrapper
+        className={classNames({
+          gameOver: victor !== undefined,
+          reversal,
+        })}
+      >
         <canvas ref={this.canvasRef} onClick={this.onCanvasClick} />
         {!room?.game ? (
           <Button onClick={() => api.startGame()}>开始对局</Button>
@@ -113,7 +124,7 @@ export class ChessBoard extends Component {
             <PieceComponent key={id} piece={piece} />
           ))
         )}
-        {gameOver ? (
+        {victor ? (
           <Restart onClick={this.chessStore.restart}>再来一局</Restart>
         ) : undefined}
       </ChessWrapper>

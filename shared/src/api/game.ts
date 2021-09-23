@@ -1,6 +1,7 @@
 import {APIContext} from '../api-context';
-import {PieceCore} from '../piece';
-import {Game, GameFaction, Piece, PiecePosition} from '../protobuf';
+import {IPiecePosition, PieceCore} from '../piece';
+import {Game, GameFaction, Piece, PieceKind} from '../protobuf';
+import {getGlobalId, getPiecesGrid, verifyPieceEdge} from '../utils';
 
 export async function startGame(this: APIContext): Promise<void> {
   let room = this.$room;
@@ -9,7 +10,7 @@ export async function startGame(this: APIContext): Promise<void> {
     return;
   }
 
-  if (room.game) {
+  if (room.game && !room.game.victor) {
     return;
   }
 
@@ -33,40 +34,17 @@ export async function changeSelectingPiece(
     return;
   }
 
-  if (
-    (game.currentFaction === GameFaction.BLUE && this.$isRed) ||
-    (game.currentFaction === GameFaction.RED && this.$isBlue)
-  ) {
-    return;
-  }
-
   if (this.$isRed) {
+    // TODO 待优化: 判断棋子
     game.redSelectingPiece = globalId;
   } else {
     game.blueSelectingPiece = globalId;
   }
 }
 
-// export async function changePieceDead(
-//   id: string | PiecePosition,
-//   _dead: boolean,
-// ): Promise<void> {
-//   if (typeof id !== 'string') {
-//     id = this.piecesGrid[id.y][id.x]!;
-//   }
-
-//   let piece = this.pieceMap[id];
-
-//   if (!piece) {
-//     return;
-//   }
-
-//   // piece.dead = dead;
-// }
-
 export async function changePiecePosition(
   this: APIContext,
-  position: PiecePosition,
+  position: IPiecePosition,
 ): Promise<void> {
   let game = this.$room?.game;
 
@@ -89,31 +67,77 @@ export async function changePiecePosition(
     return;
   }
 
-  // let selectingPiece = this.
+  let selectingPiece = game?.pieces.find(
+    piece => getGlobalId(piece) === selectingPieceId,
+  );
 
-  // // pieckan
-  // PieceCore[selectingPiece.kind].getNextPositions(selectingPiece.position, {
-  //   // faction: GameFaction;
-  //   // overseas: boolean;
-  //   // piecesGrid: PiecesGrid;
-  //   faction: GameFaction.RED,
-  //   overseas: true,
-  //   piecesGrid: [],
-  // });
+  if (!selectingPiece) {
+    return;
+  }
 
-  // game.redSelectingPiece = piece;
+  let piecesGrid = getPiecesGrid(game.pieces);
+  let nextPositions = PieceCore[selectingPiece.kind].getNextPositions(
+    selectingPiece.position,
+    {
+      faction: selectingPiece.faction,
+      overseas: true,
+      piecesGrid,
+    },
+  );
+
+  if (
+    !nextPositions.some(
+      ({x, y}) =>
+        position.x === x && position.y === y && verifyPieceEdge(position),
+    )
+  ) {
+    return;
+  }
+
+  let attachTarget = piecesGrid[position.y][position.x];
+
+  selectingPiece.position.x = position.x;
+  selectingPiece.position.y = position.y;
+
+  if (attachTarget) {
+    let attachTargetPiece = game.pieces.find(
+      piece => getGlobalId(piece) === attachTarget,
+    )!;
+
+    attachTargetPiece.dead = true;
+  }
+
+  if (this.$isRed) {
+    game.redSelectingPiece = undefined;
+  } else {
+    game.blueSelectingPiece = undefined;
+  }
+
+  game.currentFaction =
+    game.currentFaction === GameFaction.RED
+      ? GameFaction.BLUE
+      : GameFaction.RED;
+
+  checkGameOver(game);
 }
-
-// export async function toggleCurrentFaction(): Promise<void> {
-//   this.currentFaction =
-//     this.currentFaction === GameFaction.RED
-//       ? GameFaction.BLUE
-//       : GameFaction.RED;
-// }
 
 function initializePieces(): Piece[] {
   return Object.values(PieceCore).flatMap(({initializePieces}) => [
     ...initializePieces(GameFaction.RED),
     ...initializePieces(GameFaction.BLUE),
   ]);
+}
+
+function checkGameOver(game: Game): void {
+  for (let piece of game.pieces) {
+    if (piece.kind !== PieceKind.KING || !piece.dead) {
+      continue;
+    }
+
+    if (piece.faction === GameFaction.RED) {
+      game.victor = GameFaction.BLUE;
+    } else {
+      game.victor = GameFaction.RED;
+    }
+  }
 }

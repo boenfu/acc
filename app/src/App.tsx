@@ -2,6 +2,8 @@ import {Provider, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
 import styled from 'styled-components';
 
+import {CONTAINER_WIDTH} from '../../shared';
+
 import {
   ApplicationCard,
   ChessBoard,
@@ -9,7 +11,6 @@ import {
   PieceCard,
   RoomInfo,
 } from './components';
-import {CONTAINER_WIDTH} from './const';
 import * as stores from './stores';
 
 const Wrapper = styled.div`

@@ -1,15 +1,16 @@
-import {computed, makeObservable} from 'mobx';
+import {computed, makeObservable, observable} from 'mobx';
 import {FC} from 'react';
 
 import {
+  CHESSBOARD_ROW_SIZE,
   GameFaction,
   IPiecePosition,
   Piece as PieceMessage,
   PieceContext,
   PieceCore,
   PiecesGrid,
+  getGlobalId,
 } from '../../../shared';
-import {CHESSBOARD_ROW_SIZE} from '../const';
 
 export type PiecePosition = IPiecePosition;
 
@@ -34,16 +35,14 @@ export interface PieceIdentity {
 export abstract class Piece {
   abstract identity: PieceIdentity;
 
+  position!: PiecePosition;
+
   get globalId(): string {
     return getGlobalId(this.message);
   }
 
   get faction(): GameFaction {
     return this.message.faction;
-  }
-
-  get position(): PiecePosition {
-    return this.message.position;
   }
 
   get dead(): boolean {
@@ -82,14 +81,13 @@ export abstract class Piece {
     readonly message: PieceMessage,
     readonly chessContext: ChessContext,
   ) {
+    this.position = this.message.position;
+
     makeObservable(this, {
+      position: observable,
       context: computed,
       nextPositions: computed,
       overseas: computed,
     });
   }
-}
-
-export function getGlobalId({faction, kind, id}: PieceMessage): string {
-  return `${faction}_${kind}_${id}`;
 }

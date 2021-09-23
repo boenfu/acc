@@ -118,7 +118,3 @@ Socket.prototype.$leave = async function (this: Socket, roomId: string) {
 
   this.$sync(roomId);
 };
-
-setInterval(() => {
-  console.log([...Socket.prototype.$roomMap.values()][0]);
-}, 4000);

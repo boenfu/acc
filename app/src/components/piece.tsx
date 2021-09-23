@@ -9,10 +9,10 @@ import {
   CONTAINER_PADDING,
   GRID_SIZE,
   PIECE_RADIUS,
-} from '../const';
+} from '../../../shared';
 import {Piece, PiecePosition} from '../piece';
 import {Aim, Attack} from '../resources/icons';
-import {IChessStore} from '../stores';
+import {IChessStore, IRoomStore} from '../stores';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -20,6 +20,7 @@ const Wrapper = styled.div`
   top: 0;
   font-size: ${PIECE_RADIUS * 2}px;
   transition: transform 0.2s ease-out;
+  user-select: none;
 
   &.dead {
     @keyframes piece-dead {
@@ -81,6 +82,10 @@ const AttackWrapper = styled(Wrapper)`
 export class PieceComponent extends Component<{
   piece: Piece;
 }> {
+  private get roomStore(): IRoomStore {
+    return this.context.roomStore;
+  }
+
   private get chessStore(): IChessStore {
     return this.context.chessStore;
   }
@@ -92,18 +97,31 @@ export class PieceComponent extends Component<{
 
   @computed
   private get active(): boolean {
-    return this.chessStore.selecting === this.props.piece.globalId;
+    let {
+      piece: {globalId},
+    } = this.props;
+
+    let {selecting, myTum} = this.chessStore;
+
+    return myTum && selecting === globalId;
   }
 
   @computed
   private get highlight(): boolean {
-    return this.chessStore.competitorSelecting === this.props.piece.globalId;
+    let {
+      piece: {globalId},
+    } = this.props;
+
+    let {selecting, competitorSelecting} = this.chessStore;
+
+    return selecting === globalId || competitorSelecting === globalId;
   }
 
   render(): ReactNode {
     let {position, dead, Icon} = this.piece;
     let {left, top} = getTranslateStyle(position);
 
+    let reversal = this.roomStore.isBlue;
     let {moveable, attackable} = this.active
       ? groupPositions(this.piece)
       : {
@@ -117,8 +135,8 @@ export class PieceComponent extends Component<{
           className={dead ? 'dead' : undefined}
           style={{
             transform: `translate(calc(${left}px - 50%), calc(${top}px - 50%)) ${
-              this.active || this.highlight ? 'scale(1.4)' : ''
-            }`,
+              this.highlight ? 'scale(1.4)' : ''
+            } ${reversal ? 'rotate(-180deg)' : ''}`,
           }}
           onClick={this.onSelect}
         >
@@ -134,7 +152,7 @@ export class PieceComponent extends Component<{
               style={{
                 transform: `translate(calc(${left}px - 50%), calc(${top}px - 50%))`,
               }}
-              onClick={this.onMove}
+              onClick={this.onNext}
             >
               <Aim />
             </AimWrapper>
@@ -148,9 +166,11 @@ export class PieceComponent extends Component<{
               key={index}
               data-grid={`${position.x},${position.y}`}
               style={{
-                transform: `translate(calc(${left}px - 50%), calc(${top}px - 50%))`,
+                transform: `translate(calc(${left}px - 50%), calc(${top}px - 50%)) ${
+                  reversal ? 'rotate(-180deg)' : ''
+                }`,
               }}
-              onClick={this.onAttack}
+              onClick={this.onNext}
             >
               <Attack />
             </AttackWrapper>
@@ -161,25 +181,18 @@ export class PieceComponent extends Component<{
   }
 
   private onSelect = (): void => {
-    this.chessStore.changeSelectingPiece(this.active ? undefined : this.piece);
+    this.chessStore.changeSelectingPiece(
+      this.highlight ? undefined : this.piece,
+    );
   };
 
-  private onMove = (event: MouseEvent<HTMLDivElement>): void => {
+  private onNext = (event: MouseEvent<HTMLDivElement>): void => {
     let [x, y] = (event.target as HTMLElement).dataset.grid!.split(',');
 
-    // this.chessStore.changePiecePosition(this.piece.globalId, {x: +x, y: +y});
-    // this.chessStore.changeSelectingPiece(undefined);
-    // this.chessStore.toggleCurrentFaction();
-  };
-
-  private onAttack = (event: MouseEvent<HTMLDivElement>): void => {
-    let [x, y] = (event.target as HTMLElement).dataset.grid!.split(',');
-
-    let position = {x: +x, y: +y};
-    // this.chessStore.changePieceDead(position, true);
-    // this.chessStore.changePiecePosition(this.piece.globalId, position);
-    // this.chessStore.changeSelectingPiece(undefined);
-    // this.chessStore.toggleCurrentFaction();
+    this.chessStore.changePiecePosition(this.piece.globalId, {
+      x: +x,
+      y: +y,
+    });
   };
 
   static contextType = MobXProviderContext;
