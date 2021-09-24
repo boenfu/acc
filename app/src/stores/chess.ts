@@ -1,12 +1,12 @@
 import {action, autorun, computed, makeObservable, observable} from 'mobx';
-
 import {
   CHESSBOARD_COLUMN_SIZE,
   CHESSBOARD_ROW_SIZE,
   GameFaction,
   PiecesGrid,
   Room,
-} from '../../../shared';
+} from 'shared';
+
 import {
   ChessContext,
   Piece,

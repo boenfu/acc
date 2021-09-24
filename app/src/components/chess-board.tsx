@@ -3,8 +3,6 @@ import classNames from 'classnames';
 import {computed} from 'mobx';
 import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, MouseEvent, ReactNode, createRef} from 'react';
-import styled from 'styled-components';
-
 import {
   CHESSBOARD_HEIGHT,
   CHESSBOARD_WIDTH,
@@ -14,7 +12,9 @@ import {
   GRID_SIZE,
   GameFaction,
   PIECE_RADIUS,
-} from '../../../shared';
+} from 'shared';
+import styled from 'styled-components';
+
 import * as stores from '../stores';
 import {IChessStore, IRoomStore} from '../stores';
 

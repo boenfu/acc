@@ -4,8 +4,9 @@
     "composite": true,
 
     "rootDir": "src",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "experimentalDecorators": true,
+    "useDefineForClassFields": true,
 
     "outDir": "bld"
   }

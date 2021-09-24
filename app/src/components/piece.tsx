@@ -1,15 +1,15 @@
 import {computed} from 'mobx';
 import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, MouseEvent, ReactNode} from 'react';
-import styled from 'styled-components';
-
 import {
   CHESSBOARD_COLUMN_SIZE,
   CHESSBOARD_ROW_SIZE,
   CONTAINER_PADDING,
   GRID_SIZE,
   PIECE_RADIUS,
-} from '../../../shared';
+} from 'shared';
+import styled from 'styled-components';
+
 import {Piece, PiecePosition} from '../piece';
 import {Aim, Attack} from '../resources/icons';
 import {IChessStore, IRoomStore} from '../stores';

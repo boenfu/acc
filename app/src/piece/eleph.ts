@@ -1,4 +1,5 @@
-import {GameFaction} from '../../../shared';
+import {GameFaction} from 'shared';
+
 import {ElephBlue, ElephRed} from '../resources/icons';
 
 import {Piece, PieceIdentity} from './piece';

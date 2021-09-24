@@ -1,5 +1,5 @@
 import {customAlphabet} from 'nanoid';
-import {Field, Message} from 'protobufjs/light';
+import {Field, Message} from 'protobufjs';
 
 import {Game} from './game';
 import {Player} from './player';

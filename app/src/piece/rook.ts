@@ -1,4 +1,5 @@
-import {GameFaction} from '../../../shared';
+import {GameFaction} from 'shared';
+
 import {RookBlue, RookRed} from '../resources/icons';
 
 import {Piece, PieceIdentity} from './piece';

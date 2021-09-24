@@ -6,12 +6,20 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node bld/main.js"
+    "start": "node bld/main.js",
+    "build": "rimraf bld && yarn tsc --build --force",
+    "serve": "cross-env NODE_ENV=production node bld/main.js"
   },
   "dependencies": {
+    "chinese-random-name": "^1.0.0",
     "fastify": "^3.21.0",
+    "fastify-reply-from": "^6.1.0",
     "fastify-socket.io": "^2.0.1",
+    "fastify-static": "^4.2.3",
     "nanoid": "^3.1.25",
     "protobufjs": "^6.11.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

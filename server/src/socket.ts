@@ -3,6 +3,8 @@ import {Socket} from 'socket.io';
 
 import {Player, Room, isBlue, isRed} from '../../shared';
 
+import {getRandomName} from './utils';
+
 declare module 'socket.io' {
   interface Socket {
     $roomId: string;
@@ -63,10 +65,12 @@ Socket.prototype.$join = async function (this: Socket, roomId: string) {
   if (!room.redPlayer) {
     let player = new Player();
     player.id = this.id;
+    player.displayName = getRandomName();
     room.redPlayer = player;
   } else if (!room.bluePlayer) {
     let player = new Player();
     player.id = this.id;
+    player.displayName = getRandomName();
     room.bluePlayer = player;
   } else {
     return false;

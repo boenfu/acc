@@ -1,4 +1,4 @@
-import {PieceKind} from '../../../shared';
+import {PieceKind} from 'shared';
 
 import {Cannon} from './cannon';
 import {Eleph} from './eleph';

@@ -2,8 +2,8 @@ import {Button, Tooltip, message} from 'antd';
 import {reaction} from 'mobx';
 import {MobXProviderContext, disposeOnUnmount, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
+import {RequestStatus} from 'shared';
 
-import {RequestStatus} from '../../../shared';
 import {IRoomStore} from '../stores';
 
 @observer

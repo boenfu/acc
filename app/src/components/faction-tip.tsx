@@ -1,9 +1,9 @@
 import {computed} from 'mobx';
 import {MobXProviderContext, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
+import {GameFaction} from 'shared';
 import styled from 'styled-components';
 
-import {GameFaction} from '../../../shared';
 import {IChessStore, IRoomStore} from '../stores';
 
 const Wrapper = styled.div`

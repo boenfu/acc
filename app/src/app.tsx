@@ -1,8 +1,7 @@
 import {Provider, observer} from 'mobx-react';
 import React, {Component, ReactNode} from 'react';
+import {CONTAINER_WIDTH} from 'shared';
 import styled from 'styled-components';
-
-import {CONTAINER_WIDTH} from '../../shared';
 
 import {
   ApplicationCard,
@@ -42,7 +41,7 @@ const Right = styled.div`
 `;
 
 @observer
-export default class extends Component {
+export class App extends Component {
   render(): ReactNode {
     return (
       <Wrapper className="app">

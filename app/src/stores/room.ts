@@ -1,7 +1,6 @@
 import {makeAutoObservable, runInAction} from 'mobx';
+import {API, APIContext, Room, isBlue, isRed} from 'shared';
 import io from 'socket.io-client';
-
-import {API, APIContext, Room, isBlue, isRed} from '../../../shared';
 
 type APIClient = typeof API & APIContext;
 
@@ -14,7 +13,7 @@ export interface IRoomStore {
 }
 
 class RoomStore implements IRoomStore {
-  private socket = io('http://localhost:8080', {
+  private socket = io('/', {
     auth: {
       room: location.hash && location.hash.slice(1),
     },

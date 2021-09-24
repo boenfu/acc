@@ -1,6 +1,5 @@
 import {computed, makeObservable, observable} from 'mobx';
 import {FC} from 'react';
-
 import {
   CHESSBOARD_ROW_SIZE,
   GameFaction,
@@ -10,7 +9,7 @@ import {
   PieceCore,
   PiecesGrid,
   getGlobalId,
-} from '../../../shared';
+} from 'shared';
 
 export type PiecePosition = IPiecePosition;
 

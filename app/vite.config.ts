@@ -4,7 +4,7 @@ import {defineConfig} from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [reactRefresh()],
-  base: '/acc/',
+  base: '/app/',
   resolve: {
     alias: [
       {
@@ -12,12 +12,15 @@ export default defineConfig({
         replacement: 'socket.io-client/dist/socket.io.js',
       },
       {
+        find: 'protobufjs',
+        replacement: 'protobufjs/dist/protobuf.min.js',
+      },
+      {
         find: /^~/,
         replacement: '',
       },
     ],
   },
-
   css: {
     preprocessorOptions: {
       less: {

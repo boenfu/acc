@@ -1,9 +1,15 @@
+import * as Path from 'path';
+
 import fastify from 'fastify';
+import replyFrom from 'fastify-reply-from';
 import socketServer from 'fastify-socket.io';
+import static_ from 'fastify-static';
 
 import {API, Room} from '../../shared';
 
 import './socket';
+
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 (async () => {
   const app = fastify({logger: true});
@@ -13,6 +19,19 @@ import './socket';
       origin: '*',
     },
   });
+
+  if (IS_PRODUCTION) {
+    await app.register(static_, {
+      root: Path.join(__dirname, '../../app/dist'),
+      prefix: '/app/',
+    });
+  } else {
+    await app.register(replyFrom, {
+      base: 'http://localhost:3000',
+    });
+
+    app.get('/app/*', ({url}, reply) => reply.from(url));
+  }
 
   app.ready(err => {
     if (err) throw err;

@@ -1,4 +1,4 @@
-import {Field, Message} from 'protobufjs/light';
+import {Field, Message} from 'protobufjs';
 
 import {GameFaction, PieceKind} from './_enum';
 
