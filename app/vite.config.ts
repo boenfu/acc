@@ -5,6 +5,9 @@ import {defineConfig} from 'vite';
 export default defineConfig({
   plugins: [reactRefresh()],
   base: '/app/',
+  build: {
+    minify: false,
+  },
   resolve: {
     alias: [
       {

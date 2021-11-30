@@ -5,14 +5,12 @@ import styled from 'styled-components';
 import {Github, Logo} from '../resources/icons';
 
 const Wrapper = styled.div`
-  height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 
   svg {
-    font-size: 82px;
+    font-size: 32px;
   }
 `;
 
@@ -40,45 +38,28 @@ const Links = styled.div`
   }
 `;
 
-const TODOList = styled.ul`
-  padding: 24px 64px 24px 24px;
-  border-radius: 2px;
-  font-size: 12px;
-  line-height: 20px;
-  color: #444;
-`;
-
-const TODO = styled.li``;
-
 @observer
-export class ApplicationCard extends Component {
+export class ApplicationCard extends Component<{basic?: boolean}> {
   render(): ReactNode {
+    let {basic = false} = this.props;
+
     return (
-      <Wrapper>
+      <Wrapper className="application-card">
         <Logo />
         <ApplicationInfo>
-          Animal Chinese Chess
-          <ApplicationVersion> V0.1.0</ApplicationVersion>
+          Animal Chinese Chess ( Online )
+          {!basic && <ApplicationVersion> V0.1.0</ApplicationVersion>}
         </ApplicationInfo>
-        <ApplicationInfo>(中国象棋动物版)</ApplicationInfo>
-        <Links>
-          <a href="https://github.com/boenfu/acc" target="_blank">
-            <Github />
-          </a>
-        </Links>
-        <TODOList>
-          <TODO
-            style={{
-              textDecoration: 'line-through',
-              opacity: 0.5,
-            }}
-          >
-            基本的行棋规则
-          </TODO>
-          <TODO>动物合体机制</TODO>
-          <TODO>用户魔法卡</TODO>
-          <TODO>通过网络对战</TODO>
-        </TODOList>
+        {!basic && (
+          <>
+            <ApplicationInfo>(中国象棋动物版)</ApplicationInfo>
+            <Links>
+              <a href="https://github.com/boenfu/acc" target="_blank">
+                <Github />
+              </a>
+            </Links>
+          </>
+        )}
       </Wrapper>
     );
   }

@@ -4,3 +4,7 @@ export * from './chess-board';
 export * from './faction-tip';
 export * from './application-card';
 export * from './room-info';
+export * from './menus';
+export * from './swop-faction';
+export * from './lottery';
+export * from './background';

@@ -12,7 +12,7 @@ import './socket';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 (async () => {
-  const app = fastify({logger: true});
+  const app = fastify({logger: false});
 
   await app.register(socketServer, {
     cors: {
